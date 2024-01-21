@@ -1,16 +1,18 @@
 ---
-# database used for syncing 
+# (Optional) Database name used for syncing 
 db_sync: "KodiFileSync"
+
 # tuples specifying (kodi version, database name) for two or more Kodi databases
 # NOTE: One line per Kodi version. Syncing multiple databases per Kodi version to another
 # Kodi version is not yet supported.
 kodi_dbs:
   - !!python/tuple [19, "MyVideos119"]
   - !!python/tuple [20, "MyVideos121"]
-# ADVANCED: only change if you know how the logic works  
+
+# (Optional) CAUTION: only change if you know are familiar with the syncing logic 
 steps:
-  create_sync_database: false
+  create_sync_database: true
   create_triggers: true
-  push_inserts: false
+  push_inserts: true
   create_views: true
   create_events: true

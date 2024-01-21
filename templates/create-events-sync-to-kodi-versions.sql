@@ -70,7 +70,7 @@ ON DUPLICATE KEY UPDATE
 	playerState = u.new_playerState,
 	type = u.new_type;
 
-DELETE FROM MyVideos119.bookmark WHERE idBookmark IN 
+DELETE FROM {{ db_kodi }}.bookmark WHERE idBookmark IN 
 (SELECT new_idBookmark FROM {{ db_sync }}.temp_bookmark_update_{{ kodi_version }} u 
 WHERE new_timeInSeconds IS NULL);
 
