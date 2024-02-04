@@ -6,6 +6,7 @@ db_sync: "KodiFileSync"
 # NOTE: One line per Kodi version. Syncing multiple databases per Kodi version to another
 # Kodi version is not yet supported.
 kodi_dbs:
+  - !!python/tuple [18, "MyVideos116"]
   - !!python/tuple [19, "MyVideos119"]
   - !!python/tuple [20, "MyVideos121"]
 

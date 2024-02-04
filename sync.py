@@ -9,6 +9,7 @@ import time
 import mysql.connector
 import os
 import yaml
+import time
 
 from jinja2 import Environment, FileSystemLoader
 from dotenv import load_dotenv
@@ -152,6 +153,8 @@ if run_config["steps"]["push_inserts"] is True:
                             "kodi_version": version},
                             f"Inserting Data from {db_kodi} to {db_sync}",
                             ";")
+        # avoids rows from different versions getting same timestamp
+        time.sleep(1)
 else:
     logger.info(f"Skip inserting data from {kodi_dbs} to {db_sync}")
 
