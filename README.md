@@ -16,11 +16,11 @@ MYSQL_PORT = 0000
 3. Set up a Python virtual environment using a virtual env tool of your choice (venv, virtualenv, conda, poetry,pipenv, pyflow). See [comparison](https://dev.to/bowmanjd/python-tools-for-managing-virtual-environments-3bko) 
 I will be using venv. 
     - Create a virtual enviroment called kfs in your working directory `python -m venv kfs`
-    - Activate the virtual environment using `source kfs/bin/activate`
+    - Activate the virtual environment using `source kfs/bin/activate` or if on Windows `source kfs/Scripts/activate`
     - Install `pip-tools` in the virutal environment by `pip install pip-tools`
 4. Install dependencies
     - Identitfy the `requirements/[env]-requirements.txt` file where `[env]` denotes the appropriate python environment you're in, namely your OS and python version. I'll use `requirements/linux-py3.8-requirements.txt` from now on.
-        - If a requriments file does not exist for your python environment, then create one by running `pip-compile  --output-file requirements/{os}-{python-version}-requirements.txt`
+        - If a `requirements/[env]-requirements.txt` file does not exist for your python environment, then create one by running `pip-compile  --output-file requirements/{os}-{python-version}-requirements.txt`
     - Install the requriements in the virtual env by running `pip-sync requirements/linux-py3.8-requirements.txt`
         
 5. Modify the `config.yaml`
