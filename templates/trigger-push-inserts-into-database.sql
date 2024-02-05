@@ -20,7 +20,9 @@ INTO
 	str_settings,
 	no_update,
 	exclude,
+	{% if kodi_version >= 19 %}
 	all_audio,
+	{% endif %}
 	date_added,
 	id_parent_path,
 	kodi_version,
@@ -37,7 +39,9 @@ VALUES
 	NEW.strSettings,
 	NEW.noUpdate,
 	NEW.exclude,
+	{%if kodi_version >= 19 %}
 	NEW.allAudio,
+	{% endif %}
 	NEW.dateAdded,
 	NEW.idParentPath,
 	{{ kodi_version }},

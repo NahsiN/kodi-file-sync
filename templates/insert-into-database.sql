@@ -13,7 +13,11 @@ SELECT
 	p.strSettings AS str_settings,
 	p.noUpdate AS no_update,
 	p.exclude AS exclude,
+	{% if kodi_version >= 19 %}
 	p.allAudio AS all_audio,
+	{% elif kodi_version < 19 %}
+	NULL AS all_audio,
+	{% endif %}
 	p.dateAdded AS date_added,
 	p.idParentPath AS id_parent_path,
 	{{ kodi_version }} AS kodi_version,

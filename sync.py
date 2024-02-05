@@ -19,6 +19,7 @@ from tqdm import tqdm
 # Set up logger
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+# logger.setLevel(logging.DEBUG)
 formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
 # Log to console
@@ -60,7 +61,8 @@ def execute_query(cursor, query: str):
         logger.debug(f"Executing query {query}")
         cursor.execute(query)
     except mysql.connector.Error as err:
-        logger.info(f"Failed to execute query: {err}")
+        logger.info(f"Failed to execute {query}")
+        logger.info(f"Error in executing query: {err}")
         exit(1)
 
 
@@ -153,7 +155,7 @@ if run_config["steps"]["push_inserts"] is True:
                             "kodi_version": version},
                             f"Inserting Data from {db_kodi} to {db_sync}",
                             ";")
-        # avoids rows from different versions getting same timestamp
+        # avoids rows from different kodi databases from getting the same timestamp
         time.sleep(1)
 else:
     logger.info(f"Skip inserting data from {kodi_dbs} to {db_sync}")

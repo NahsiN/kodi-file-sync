@@ -15,7 +15,9 @@ SET
 	str_settings=NEW.strSettings,
 	no_update=NEW.noUpdate,
 	exclude=NEW.exclude,
+	{%if kodi_version >= 19 %}
 	all_audio=NEW.allAudio,
+	{% endif %}
 	date_added=NEW.dateAdded,
 	id_parent_path=NEW.idParentPath,
 	updated_at=CURRENT_TIMESTAMP()
