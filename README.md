@@ -1,7 +1,8 @@
 # KodiFileSync 🔄
-If using a central database to manage your Kodi database(s), this project aims to sync 
-_certain_ video file metadata across Kodi versions. The metadata includes resume bookmarks, 
-player settings, play counts, last played, etc. The metadata excludes metadata such as movie names, ratings, actors, genres, etc. 
+If using a central database server to manage your Kodi library, e.g. [MySQL](https://kodi.wiki/view/MySQL), 
+this project aims to _sync certain video file metadata across Kodi versions_. The metadata includes 
+resume type bookmarks, settings such as audio or subtitle track, play counts, last played etc.
+The metadata _excludes_ metadata such as movie/tv show names, ratings, actors, genres etc. 
 
 
 # Installation
@@ -28,16 +29,30 @@ I will be using venv.
 6. Run Script `python sync.py` This will create the database, triggers, inserts, events necessary for file syncing
 7. Deactivate the environment using `deactivate`. Test it out
 
+
 # Troubleshooting
 
 # Known Issues/Limitations
-- During the setup if the databases are out of sync e.g. different bookmark resume points, they will remain out of sync until a file is accessed in either of the Kodi versions post setup. 
-- Only one user per Kodi database is supported at the moment. You can't sync multiple users in your Kodi database across versions
-- Since a file is defined by its full filesystem path (absolute file paths), the same file across different filesystems are treated as different files. This problem is non-existent when using network file paths.
+- Only one user per Kodi database is supported at the moment. You can't sync multiple users in your Kodi database across versions.
+- Since a file is defined by its full filesystem path (absolute file paths), the same file across different filesystems are treated as different files. This problem is non-existent when using network file paths such as smb or nfs.
+- During the initial setup, the order of the list specified in `kodi_dbs` in `config.yaml` determines which database's contents are synced with the rest. For e.g. if 
+```
+kodi_dbs:
+  - !!python/tuple [18, "MyVideos116"]
+  - !!python/tuple [19, "MyVideos119"]
+  - !!python/tuple [20, "MyVideos121"]
+```
+then the contents of 
+if the databases are out of sync e.g. different bookmark resume points, they will remain out of sync until a file is accessed in either of the Kodi versions post setup. 
 - bookmark from more recent version to be inserted are synced to the other in the first pass 
 
 # Support
 - Open up an issue or ask on the Kodi forum and please be patient. I will try my best :) 
+
+# The How
+To be specific, we seek to sync the 
+[bookmark](https://kodi.wiki/view/Databases/MyVideos#bookmark) (where `type` = 1), [files](https://kodi.wiki/view/Databases/MyVideos#files),
+[settings](https://kodi.wiki/view/Databases/MyVideos#settings) tables across versions.
 
 # Contribute
 - [Commit guidelines](https://www.conventionalcommits.org/en/v1.0.0/)

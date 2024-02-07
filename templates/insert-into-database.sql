@@ -40,7 +40,7 @@ SELECT
 	f.dateAdded AS date_added,
 	{{ kodi_version }} AS kodi_version,
 	CURRENT_TIMESTAMP() AS created_at,
-	NULL AS updated_at
+	CURRENT_TIMESTAMP() AS updated_at -- to sync files across versions after initial setup
 FROM
 	{{ db_kodi }}.files f;
 
