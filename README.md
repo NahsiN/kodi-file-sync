@@ -42,9 +42,7 @@ kodi_dbs:
   - !!python/tuple [19, "MyVideos119"]
   - !!python/tuple [20, "MyVideos121"]
 ```
-then the contents of 
-if the databases are out of sync e.g. different bookmark resume points, they will remain out of sync until a file is accessed in either of the Kodi versions post setup. 
-- bookmark from more recent version to be inserted are synced to the other in the first pass 
+then the contents of the tables `files, bookmarks, settings` in database `MyVideos121` will be synced with the others. 
 
 # Support
 - Open up an issue or ask on the Kodi forum and please be patient. I will try my best :) 
