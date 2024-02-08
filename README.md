@@ -48,9 +48,12 @@ then the contents of the tables `files, bookmarks, settings` in database `MyVide
 - Open up an issue or ask on the Kodi forum and please be patient. I will try my best :) 
 
 # The How
-To be specific, we seek to sync the 
+To be specific, we seek to sync the contents of
 [bookmark](https://kodi.wiki/view/Databases/MyVideos#bookmark) (where `type` = 1), [files](https://kodi.wiki/view/Databases/MyVideos#files),
-[settings](https://kodi.wiki/view/Databases/MyVideos#settings) tables across versions.
+and [settings](https://kodi.wiki/view/Databases/MyVideos#settings) tables across Kodi versions. 
+I believe these tables essentially contain information independent of the metadata fetched from scrapers.
 
 # Contribute
 - [Commit guidelines](https://www.conventionalcommits.org/en/v1.0.0/)
+
+- [ ] files syncing bug. updating at timestamp at insert overwrites existing files. E.g. kim's convience and play count. Also files is not syncing.
