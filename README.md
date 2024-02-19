@@ -56,4 +56,5 @@ I believe these tables essentially contain information independent of the metada
 # Contribute
 - [Commit guidelines](https://www.conventionalcommits.org/en/v1.0.0/)
 
-- [ ] files syncing bug. updating at timestamp at insert overwrites existing files. E.g. kim's convience and play count. Also files is not syncing.
+- [ ] Add a show in Kodi a. Watch an episode, change some setting and bookmarks for another episode. Then add the same show in Kodi b. See if the play count, settings, bookmarks sync.
+- [X] settings with Kim's convience not syncing

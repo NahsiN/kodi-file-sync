@@ -17,20 +17,21 @@ WITH latest_file AS
 (
 SELECT 
 *,
-MAX(updated_at) OVER (PARTITION BY full_path) AS latest_updated_at
+MAX(IFNULL(updated_at, last_played)) OVER (PARTITION BY full_path) AS latest_updated_at
 FROM
 {{ db_sync }}.files_w_path),
 
 latest_attributes AS 
 (
-SELECT 
+SELECT
+	DISTINCT -- two kodi databases/rows could've the same values due to IFNULL(updated_at, last_played) above
 	full_path, latest_updated_at, 
 	play_count AS latest_play_count,
 	last_played AS latest_last_played,
 	date_added AS latest_date_added
 FROM 
 	latest_file
-WHERE latest_updated_at = updated_at),
+WHERE latest_updated_at = IFNULL(updated_at, last_played)),
 
 files_to_update AS 
 (
