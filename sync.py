@@ -134,7 +134,7 @@ if run_config["steps"]["create_triggers"] is True:
                             {"db_kodi": db_kodi, "db_sync": db_sync,
                             "kodi_version": version},
                             f"Creating Update Triggers in {db_kodi}",
-                            ";")
+                            "//")
         
         execute_sql_template(environment, cursor,
                             "trigger-push-deletes-into-database.sql",

@@ -1,4 +1,5 @@
-DROP TRIGGER IF EXISTS {{ db_kodi }}.push_update_path_to_kodi_file_sync;
+DROP TRIGGER IF EXISTS {{ db_kodi }}.push_update_path_to_kodi_file_sync //
+
 CREATE TRIGGER {{ db_kodi }}.push_update_path_to_kodi_file_sync AFTER
 UPDATE
 	ON
@@ -22,28 +23,58 @@ SET
 	id_parent_path=NEW.idParentPath,
 	updated_at=CURRENT_TIMESTAMP()
 	WHERE
-	kodi_version = {{ kodi_version }} AND id_path = NEW.idPath;
+	kodi_version = {{ kodi_version }} AND id_path = NEW.idPath //
 
 
-DROP TRIGGER IF EXISTS {{ db_kodi }}.push_update_files_to_kodi_file_sync;
-CREATE TRIGGER {{ db_kodi }}.push_update_files_to_kodi_file_sync AFTER
+DROP TRIGGER IF EXISTS {{ db_kodi }}.push_update_files_to_kodi_file_sync //
+
+CREATE TRIGGER {{ db_kodi }}.push_update_files_to_kodi_file_sync BEFORE
 UPDATE
 	ON
 	{{ db_kodi }}.files
-FOR EACH ROW 
-UPDATE {{ db_sync }}.files
-SET 
-	id_path=NEW.idPath,
-	str_filename=NEW.strFilename,
-	play_count=NEW.playCount,
-	last_played=NEW.lastPlayed,
-	date_added=NEW.dateAdded,
-	updated_at=CURRENT_TIMESTAMP() 
-	WHERE 
-	kodi_version = {{ kodi_version }} AND id_file = NEW.idFile;
+FOR EACH ROW
+BEGIN 
+	-- when a file is initially added to Kodi, it is a two step process
+	-- 1. insert into files creating a new idFile
+	-- 2. Update row with non-null date_added
+	IF OLD.dateAdded IS NULL AND NEW.dateAdded IS NOT NULL THEN
+		UPDATE {{ db_sync }}.files
+		SET 
+		date_added = NEW.dateAdded,
+		created_at = CURRENT_TIMESTAMP()
+		WHERE 
+		kodi_version = {{ kodi_version }} AND id_file = NEW.idFile;
+	
+	-- update is triggered by another field other than date_added
+	ELSEIF IFNULL(OLD.dateAdded, '1800-01-01 00:00:00') = IFNULL(NEW.dateAdded, '1800-01-01 00:00:00') THEN
+		UPDATE {{ db_sync }}.files
+		SET 
+			id_path = NEW.idPath,
+			str_filename = NEW.strFilename,
+			play_count = NEW.playCount,
+			last_played = NEW.lastPlayed,
+			/*
+			when kodi adds a new file into its database as a result of library import, its does so in
+			3 sequential steps which are:
+			1) insert into files (idFile, idPath, strFileName) values(NULL, 1, 'fname.mkv')
+			2) UPDATE files SET dateAdded='1800-01-01 00:50:00' WHERE idFile=1
+			3) update files set playCount=NULL,lastPlayed=NULL where idFile=1
+			we prefer to count these steps as part of "creation" and not "update" to preserve the 
+			behaviour on how file updates propagate across versions. Hence we
+			prefer these steps update the created_at field instead of the updated_at field
+			*/
+			created_at = IF(TIMESTAMPDIFF(SECOND, created_at, CURRENT_TIMESTAMP()) <= 20, 
+							CURRENT_TIMESTAMP(), created_at),
+			updated_at = IF(TIMESTAMPDIFF(SECOND, created_at, CURRENT_TIMESTAMP()) <= 20, 
+							updated_at, CURRENT_TIMESTAMP()) 
+			WHERE 
+			kodi_version = {{ kodi_version }} AND id_file = NEW.idFile;
+	END IF;
+END //
 
 
-DROP TRIGGER IF EXISTS {{ db_kodi }}.push_update_bookmark_to_kodi_file_sync;
+DROP TRIGGER IF EXISTS {{ db_kodi }}.push_update_bookmark_to_kodi_file_sync //
+
 CREATE TRIGGER {{ db_kodi }}.push_update_bookmark_to_kodi_file_sync AFTER
 UPDATE
 	ON
@@ -62,10 +93,11 @@ SET
 	type=NEW.type,
 	updated_at=CURRENT_TIMESTAMP() 
 	WHERE 
-		kodi_version={{ kodi_version }} AND id_bookmark=NEW.idBookmark;
+		kodi_version={{ kodi_version }} AND id_bookmark=NEW.idBookmark //
 
 
-DROP TRIGGER IF EXISTS {{ db_kodi }}.push_update_settings_to_kodi_file_sync;
+DROP TRIGGER IF EXISTS {{ db_kodi }}.push_update_settings_to_kodi_file_sync //
+
 CREATE TRIGGER {{ db_kodi }}.push_update_settings_to_kodi_file_sync AFTER UPDATE 
 ON {{ db_kodi }}.settings 
 FOR EACH ROW
@@ -100,4 +132,4 @@ UPDATE {{ db_sync }}.settings SET
 	center_mix_level = NEW.CenterMixLevel,
 	updated_at = CURRENT_TIMESTAMP()
 WHERE
-	kodi_version = {{ kodi_version }} AND id_file = NEW.idFile;
+	kodi_version = {{ kodi_version }} AND id_file = NEW.idFile //

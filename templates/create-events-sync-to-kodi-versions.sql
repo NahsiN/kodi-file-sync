@@ -90,7 +90,7 @@ CREATE TEMPORARY TABLE {{ db_sync }}.temp_files_update_{{ kodi_version }}
 
 WITH files_file_sync AS (
 SELECT * FROM {{ db_sync }}.files f 
-WHERE f.kodi_version = {{ kodi_version }} AND f.last_played IS NOT NULL
+WHERE f.kodi_version = {{ kodi_version }}
 ),
 
 files_version AS 
