@@ -28,7 +28,7 @@ SET
 
 DROP TRIGGER IF EXISTS {{ db_kodi }}.push_update_files_to_kodi_file_sync //
 
-CREATE TRIGGER {{ db_kodi }}.push_update_files_to_kodi_file_sync BEFORE
+CREATE TRIGGER {{ db_kodi }}.push_update_files_to_kodi_file_sync AFTER
 UPDATE
 	ON
 	{{ db_kodi }}.files
@@ -36,24 +36,9 @@ FOR EACH ROW
 BEGIN 
 	-- when a file is initially added to Kodi, it is a two step process
 	-- 1. insert into files creating a new idFile
-	-- 2. Update row with non-null date_added
+	-- 2. Update row with non-null dateAdded
 	IF OLD.dateAdded IS NULL AND NEW.dateAdded IS NOT NULL THEN
-		UPDATE {{ db_sync }}.files
-		SET 
-		date_added = NEW.dateAdded,
-		created_at = CURRENT_TIMESTAMP()
-		WHERE 
-		kodi_version = {{ kodi_version }} AND id_file = NEW.idFile;
-	
-	-- update is triggered by another field other than date_added
-	ELSEIF IFNULL(OLD.dateAdded, '1800-01-01 00:00:00') = IFNULL(NEW.dateAdded, '1800-01-01 00:00:00') THEN
-		UPDATE {{ db_sync }}.files
-		SET 
-			id_path = NEW.idPath,
-			str_filename = NEW.strFilename,
-			play_count = NEW.playCount,
-			last_played = NEW.lastPlayed,
-			/*
+		/*
 			when kodi adds a new file into its database as a result of library import, its does so in
 			3 sequential steps which are:
 			1) insert into files (idFile, idPath, strFileName) values(NULL, 1, 'fname.mkv')
@@ -62,11 +47,32 @@ BEGIN
 			we prefer to count these steps as part of "creation" and not "update" to preserve the 
 			behaviour on how file updates propagate across versions. Hence we
 			prefer these steps update the created_at field instead of the updated_at field
-			*/
-			created_at = IF(TIMESTAMPDIFF(SECOND, created_at, CURRENT_TIMESTAMP()) <= 20, 
-							CURRENT_TIMESTAMP(), created_at),
-			updated_at = IF(TIMESTAMPDIFF(SECOND, created_at, CURRENT_TIMESTAMP()) <= 20, 
-							updated_at, CURRENT_TIMESTAMP()) 
+		*/
+		UPDATE {{ db_sync }}.files
+		SET 
+		date_added = NEW.dateAdded,
+		created_at = CURRENT_TIMESTAMP()
+		WHERE 
+		kodi_version = {{ kodi_version }} AND id_file = NEW.idFile;
+	
+	-- update is triggered by another field other than date_added that has changed
+	ELSEIF OLD.dateAdded != NEW.dateAdded
+			OR IFNULL(OLD.idPath, '/') != IFNULL(NEW.idPath, '/') 
+			OR IFNULL(OLD.strFileName, 'foo.mkv') != IFNULL(NEW.strFileName, 'foo.mkv') 
+			OR IFNULL(OLD.playCount, -1) != IFNULL(NEW.playCount, -1) 
+			OR IFNULL(OLD.lastPlayed, '1800-01-01 00:00:00') != IFNULL(NEW.lastPlayed, '1800-01-01 00:00:00') THEN
+		UPDATE {{ db_sync }}.files
+		SET 
+			date_added = NEW.dateAdded,
+			id_path = NEW.idPath,
+			str_filename = NEW.strFilename,
+			play_count = NEW.playCount,
+			last_played = NEW.lastPlayed,
+			-- created_at = IF(TIMESTAMPDIFF(SECOND, created_at, CURRENT_TIMESTAMP()) <= 20, 
+			-- 				CURRENT_TIMESTAMP(), created_at),
+			-- updated_at = IF(TIMESTAMPDIFF(SECOND, created_at, CURRENT_TIMESTAMP()) <= 20, 
+			-- 				updated_at, CURRENT_TIMESTAMP())
+			updated_at = CURRENT_TIMESTAMP() 
 			WHERE 
 			kodi_version = {{ kodi_version }} AND id_file = NEW.idFile;
 	END IF;
