@@ -86,6 +86,6 @@ Post the initial installtion, during normal operation, the syncing is defined by
 Follow similar instructions as in the **Install** section above for steps 1-5. For step 6, run `python clean.py` which will remove any triggers in Kodi databases and drop the syncing database.
 
 # Support/Contribute/Ideas
-- Open up an issue or ask on the Kodi forum and please be patient. I will try my best to answer in a reasonable time frame. 🙂
+- Open up an issue or ask on the [Kodi forum](https://forum.kodi.tv/showthread.php?tid=376472) and please be patient. I will try my best to answer in a reasonable time frame. 🙂
 - A debug log from your Kodi would be super helpful when troubleshooting an issue.
 - Submit a Pull Request and try your best to adhere to these [commit guidelines](https://www.conventionalcommits.org/en/v1.0.0/)
