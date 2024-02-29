@@ -21,9 +21,8 @@ I will be using venv.
     - Install `pip-tools` in the virutal environment by `pip install pip-tools`
 4. Install dependencies
     - Identitfy the `requirements/[env]-requirements.txt` file where `[env]` denotes the appropriate python environment you're in, namely your OS and python version. I'll use `requirements/linux-py3.8-requirements.txt` from now on.
-        - If a `requirements/[env]-requirements.txt` file does not exist for your python environment, then create one by running `pip-compile  --output-file requirements/{os}-{python-version}-requirements.txt`
-    - Install the requriements in the virtual env by running `pip-sync requirements/linux-py3.8-requirements.txt`
-        
+        - If a `requirements/[env]-requirements.txt` file does not exist for your python environment, then create one by running `pip-compile  --output-file requirements/{os}-{python-version}-requirements.txt` and use that.
+    - Install the requriements in the virtual env by running `pip-sync requirements/linux-py3.8-requirements.txt`  
 5. Modify the `config.yaml`
     - Enter the kodi version and associated Video databases you'd like to keep in sync. Refer to the [wiki](https://kodi.wiki/view/Databases) to find out the default video database names for different Kodi versions. NOTE: One line per Kodi version. Syncing multiple databases per Kodi version to another Kodi version is not yet supported.
 6. Run Script `python sync.py` This will create the database, triggers, inserts, events necessary for file syncing
