@@ -1,32 +1,46 @@
 # KodiFileSync 🔄
-If using a central database server to manage your Kodi library, e.g. [MySQL](https://kodi.wiki/view/MySQL), 
+If you are a using MySQL or MariaDB to manage your Kodi library, 
 this project aims to _sync certain video file metadata across Kodi versions_. The metadata includes 
 resume type bookmarks, settings such as audio or subtitle track, play counts, last played etc.
 The metadata _excludes_ information gathered from scrapers such as movie/tv show names, ratings, actors, genres etc. 
 
 
 # Installation
-1. Clone this repo onto your machine and use it as your working directory for everything below.
-2. Create a `.env` file using `touch .env`. Populate it with your MySQL server credentials. For e.g.
+1. Set up a central MySQL or MariaDB server. See [Kodi wiki](https://kodi.wiki/view/MySQL) for details. 
+2. Clone this repo onto your machine and use it as your working directory for everything below.
+3. Create a `.env` file using `touch .env`. Populate it with your MySQL/MariaDB server credentials. For e.g.
 ```
 MYSQL_HOST = "000.000.0.000"
 MYSQL_USER = "0000"
 MYSQL_PASSWORD = "0000"
 MYSQL_PORT = 0000
 ```
-3. Set up a Python virtual environment using a virtual env tool of your choice (venv, virtualenv, conda, poetry,pipenv, pyflow). See [comparison](https://dev.to/bowmanjd/python-tools-for-managing-virtual-environments-3bko) 
-I will be using venv. 
+_Note: If using MariaDB, use the same variable names as above. BUT see [caveat](#mariadb-gotcha) below._
+
+4. Set up a Python virtual environment using a virtual env tool of your choice (venv, virtualenv, conda, poetry,pipenv, pyflow). See [comparison](https://dev.to/bowmanjd/python-tools-for-managing-virtual-environments-3bko) to help
+you choose. I will be using [venv](https://docs.python.org/3/library/venv.html). 
     - Create a virtual enviroment called kfs in your working directory `python -m venv kfs`
     - Activate the virtual environment using `source kfs/bin/activate` or if on Windows `source kfs/Scripts/activate`
     - Install `pip-tools` in the virutal environment by `pip install pip-tools`
-4. Install dependencies
+5. Install dependencies
     - Identitfy the `requirements/[env]-requirements.txt` file where `[env]` denotes the appropriate python environment you're in, namely your OS and python version. I'll use `requirements/linux-py3.8-requirements.txt` from now on.
         - If a `requirements/[env]-requirements.txt` file does not exist for your python environment, then create one by running `pip-compile  --output-file requirements/{os}-{python-version}-requirements.txt` and use that.
     - Install the requriements in the virtual env by running `pip-sync requirements/linux-py3.8-requirements.txt`  
-5. Modify the `config.yaml`
+6. Modify the `config.yaml`
     - Enter the kodi version and associated Video databases you'd like to keep in sync. Refer to the [wiki](https://kodi.wiki/view/Databases) to find out the default video database names for different Kodi versions. NOTE: One line per Kodi version. Syncing multiple databases per Kodi version to another Kodi version is not yet supported.
-6. Run Script `python sync.py` This will create the database, triggers, inserts, events necessary for file syncing
-7. Deactivate the environment using `deactivate`. Test it out
+7. Run Script `python sync.py` This will create the database, triggers, inserts, events necessary for file syncing
+8. Deactivate the environment using `deactivate`. Test it out
+
+## MariaDB-Gotcha
+Please make sure the `[mariadb]` section in your MariaDB config file (on a default Linux installation, this is located at `/etc/mysql/mariadb.conf.d/50-server.cnf`) looks as follows
+```
+[mariadb]
+explicit_defaults_for_timestamp=1
+event_scheduler=1
+```
+We have to explicity set these values because the [default behaviour for timestamp fields](https://mariadb.com/kb/en/timestamp/#automatic-values) is different
+in MariaDB compared to MySQL and the [event scheduler](https://mariadb.com/kb/en/events/) is not turned on by default. And both these properties are critical to
+the proper syncing behaviour.
 
 
 # The How
@@ -78,7 +92,6 @@ Post the initial installtion, during normal operation, the syncing is defined by
 - Only one user per Kodi database is supported at the moment. You can't sync multiple users in your Kodi database across versions.
 - Since a file is defined by its full filesystem path (absolute file paths), the same file across different filesystems are treated as different files. 
     This problem is non-existent when using network file paths such as smb or nfs.
-- Only MySQL is supported at the moment.
 - The syncing is _not_ instantaneous, currently it takes anywhere between 3 to 8 minutes to propagate a change to any of the 3 tables across the different Kodi versions. 
     This will be made editable in a future versions through the `config.yaml` file.
 
@@ -89,3 +102,4 @@ Follow similar instructions as in the **Install** section above for steps 1-5. F
 - Open up an issue or ask on the [Kodi forum](https://forum.kodi.tv/showthread.php?tid=376472) and please be patient. I will try my best to answer in a reasonable time frame. 🙂
 - A debug log from your Kodi would be super helpful when troubleshooting an issue.
 - Submit a Pull Request and try your best to adhere to these [commit guidelines](https://www.conventionalcommits.org/en/v1.0.0/)
+
