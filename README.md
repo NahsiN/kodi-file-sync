@@ -15,9 +15,9 @@ MYSQL_USER = "0000"
 MYSQL_PASSWORD = "0000"
 MYSQL_PORT = 0000
 ```
-_Note: If using MariaDB, use the same variable names as above. Nothing really changes._
-4. Set up a Python virtual environment using a virtual env tool of your choice (venv, virtualenv, conda, poetry,pipenv, pyflow). See [comparison](https://dev.to/bowmanjd/python-tools-for-managing-virtual-environments-3bko) 
-I will be using venv. 
+_Note: If using MariaDB, use the same variable names as above. BUT see [caveat](#mariadb-gotcha) below._
+4. Set up a Python virtual environment using a virtual env tool of your choice (venv, virtualenv, conda, poetry,pipenv, pyflow). See [comparison](https://dev.to/bowmanjd/python-tools-for-managing-virtual-environments-3bko) to help
+you choose. I will be using [venv](https://docs.python.org/3/library/venv.html).
     - Create a virtual enviroment called kfs in your working directory `python -m venv kfs`
     - Activate the virtual environment using `source kfs/bin/activate` or if on Windows `source kfs/Scripts/activate`
     - Install `pip-tools` in the virutal environment by `pip install pip-tools`
@@ -29,6 +29,18 @@ I will be using venv.
     - Enter the kodi version and associated Video databases you'd like to keep in sync. Refer to the [wiki](https://kodi.wiki/view/Databases) to find out the default video database names for different Kodi versions. NOTE: One line per Kodi version. Syncing multiple databases per Kodi version to another Kodi version is not yet supported.
 7. Run Script `python sync.py` This will create the database, triggers, inserts, events necessary for file syncing
 8. Deactivate the environment using `deactivate`. Test it out
+
+
+## MariaDB-Gotcha
+Please make sure the `[mariadb]` section in your MariaDB config file (on a default Linux installation, this is located at `/etc/mysql/mariadb.conf.d/50-server.cnf`) looks as follows
+```
+[mariadb]
+explicit_defaults_for_timestamp=1
+event_scheduler=1
+```
+We have to explicity set these values because the [default behaviour for timestamp fields](https://mariadb.com/kb/en/timestamp/#automatic-values) is different
+in MariaDB compared to MySQL and the [event scheduler](https://mariadb.com/kb/en/events/) is not turned on by default. And both these properties are critical to
+the proper syncing behaviour.
 
 
 # The How
@@ -90,3 +102,4 @@ Follow similar instructions as in the **Install** section above for steps 1-5. F
 - Open up an issue or ask on the [Kodi forum](https://forum.kodi.tv/showthread.php?tid=376472) and please be patient. I will try my best to answer in a reasonable time frame. 🙂
 - A debug log from your Kodi would be super helpful when troubleshooting an issue.
 - Submit a Pull Request and try your best to adhere to these [commit guidelines](https://www.conventionalcommits.org/en/v1.0.0/)
+
