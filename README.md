@@ -39,8 +39,7 @@ explicit_defaults_for_timestamp=1
 event_scheduler=1
 ```
 We have to explicity set these values because the [default behaviour for timestamp fields](https://mariadb.com/kb/en/timestamp/#automatic-values) is different
-in MariaDB compared to MySQL and the [event scheduler](https://mariadb.com/kb/en/events/) is not turned on by default. And both these properties are critical to
-the proper syncing behaviour.
+in MariaDB compared to MySQL and the [event scheduler](https://mariadb.com/kb/en/events/) is not turned on by default. And both these properties are critical for proper syncing behaviour.
 
 
 # The How
