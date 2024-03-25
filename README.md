@@ -16,9 +16,8 @@ MYSQL_PASSWORD = "0000"
 MYSQL_PORT = 0000
 ```
 _Note: If using MariaDB, use the same variable names as above. BUT see [caveat](#mariadb-gotcha) below._
-
 4. Set up a Python virtual environment using a virtual env tool of your choice (venv, virtualenv, conda, poetry,pipenv, pyflow). See [comparison](https://dev.to/bowmanjd/python-tools-for-managing-virtual-environments-3bko) to help
-you choose. I will be using [venv](https://docs.python.org/3/library/venv.html). 
+you choose. I will be using [venv](https://docs.python.org/3/library/venv.html).
     - Create a virtual enviroment called kfs in your working directory `python -m venv kfs`
     - Activate the virtual environment using `source kfs/bin/activate` or if on Windows `source kfs/Scripts/activate`
     - Install `pip-tools` in the virutal environment by `pip install pip-tools`
@@ -30,6 +29,7 @@ you choose. I will be using [venv](https://docs.python.org/3/library/venv.html).
     - Enter the kodi version and associated Video databases you'd like to keep in sync. Refer to the [wiki](https://kodi.wiki/view/Databases) to find out the default video database names for different Kodi versions. NOTE: One line per Kodi version. Syncing multiple databases per Kodi version to another Kodi version is not yet supported.
 7. Run Script `python sync.py` This will create the database, triggers, inserts, events necessary for file syncing
 8. Deactivate the environment using `deactivate`. Test it out
+
 
 ## MariaDB-Gotcha
 Please make sure the `[mariadb]` section in your MariaDB config file (on a default Linux installation, this is located at `/etc/mysql/mariadb.conf.d/50-server.cnf`) looks as follows
